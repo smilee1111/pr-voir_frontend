@@ -1,0 +1,98 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #477f83, #07464B); /* Subtle gradient */
+    font-family: 'Arial', sans-serif; /* Modern font */
+}
+
+.login-form {
+    background: #F5F5F5; /* Light background for the form */
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Soft shadow */
+    text-align: center;
+    width: 320px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #07464B; /* Primary color for headings */
+    font-size: 24px;
+    font-weight: 600;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    text-align: left;
+    margin-top: 15px;
+    color: #07464B; /* Primary color for labels */
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #D1D1D1; /* Light border */
+    font-size: 14px;
+    color: #333; /* Dark text for inputs */
+    background: #FFFFFF; /* White background for inputs */
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    border-color: #0A6E7C; /* Highlight border on focus */
+    outline: none;
+}
+
+.forgot-password {
+    text-align: right;
+    font-size: 12px;
+    color: #0A6E7C; /* Complementary color for links */
+    margin-top: 5px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: #07464B; /* Darker shade on hover */
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #07464B; /* Primary color for button */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    background: #0A6E7C; /* Slightly lighter shade on hover */
+}
+
+.signup-text {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555; /* Subtle text color */
+}
+
+.signup-text a {
+    color: #0A6E7C; /* Complementary color for links */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.signup-text a:hover {
+    color: #07464B; /* Darker shade on hover */
+}
