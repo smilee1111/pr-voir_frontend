@@ -1,23 +1,23 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
-import "../style/Login.css"; // Ensure this file exists for styling
+import { useNavigate } from "react-router-dom";
+import "../style/Login.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Initialize navigation
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Username:", username);
     console.log("Password:", password);
+    navigate("/dashboard"); // Redirect to dashboard
   };
 
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Login</h2>
-        
         <label>Username</label>
         <input
           type="text"
@@ -39,8 +39,7 @@ const Login = () => {
         <button type="submit">Login</button>
 
         <p className="signup-text">
-          Not a Member?{" "}
-          <a href="#" onClick={() => navigate("/")}>Signup</a>  
+          Not a Member? <a href="#" onClick={() => navigate("/")}>Signup</a>
         </p>
       </form>
     </div>
