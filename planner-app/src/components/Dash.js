@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../style/Dash.css"; // Ensure this CSS file exists
 
 const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -17,12 +18,16 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <nav className="nav-links">
-        <a href="#">Home</a>
-        <a href="#">Tasks</a>
-        <a href="#">Schedule</a>
-        <a href="#">Profile</a>
-      </nav>
+      <nav class="navbar">
+            <ul>
+            <li><Link to="/dashboard" className="active">Home</Link></li>
+            <li><Link to="/task">Tasks</Link></li>
+            <li><Link to="/schedule">Schedule</Link></li>
+            <li><Link to="/profile">Profile</Link></li>
+            
+            </ul>
+            <img src="/planner-graphic.png" alt="Logo" className="logo" />
+        </nav>
 
       <h1>What's going on today?</h1>
 

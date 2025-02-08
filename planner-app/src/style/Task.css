@@ -1,0 +1,180 @@
+/* General Styling */
+.tasks-page {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  /* Navbar Styling */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+  }
+  
+  .navbar li {
+    margin: 0 15px;
+  }
+  
+  .navbar a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .navbar a.active {
+    color: #ff4081;
+  }
+  
+  .logo {
+    height: 40px;
+  }
+  
+/* Task Board Styling */
+.task-board {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;  /* Allows wrapping for smaller screens */
+  gap: 25px;
+  margin-top: 30px;
+  background: #e09aab;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Task Columns */
+.task-column {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 270px;
+  text-align: left;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+
+/* Column Titles */
+.task-column h3 {
+  text-align: center;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* Category Colors */
+.to-do {
+  background-color: #b34d4d;
+  color: white;
+}
+
+.doing {
+  background-color: #b89f38;
+  color: white;
+}
+
+.done {
+  background-color: #4a9c5e;
+  color: white;
+}
+
+/* Task Cards */
+.task-card {
+  background: #d97b90;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  cursor: pointer;
+  color: white;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 0.95em;
+}
+
+.task-card:hover {
+  background: #c06b80;
+  transform: scale(1.03);
+}
+
+/* Add Task Button */
+.add-task-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.85);
+  color: black;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.add-task-btn:hover {
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* 🔥 Responsive Design 🔥 */
+
+/* Medium Screens (Tablets) */
+@media (max-width: 1024px) {
+  .task-board {
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+
+  .task-column {
+    width: 45%;  /* Makes two columns in one row */
+  }
+}
+
+/* Small Screens (Phones) */
+@media (max-width: 768px) {
+  .task-board {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .task-column {
+    width: 90%; /* Each column takes full width */
+    min-height: auto;
+  }
+
+  .task-card {
+    font-size: 1em;
+  }
+}
+
+/* Extra Small Screens */
+@media (max-width: 480px) {
+  .tasks-page {
+    padding: 10px;
+  }
+
+  .task-column {
+    width: 100%;
+  }
+
+  .task-card {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+}
