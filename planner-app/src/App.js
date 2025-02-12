@@ -5,7 +5,7 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Dash from "./components/Dash";
 import Task from "./components/Task";
-
+import Schedule from "./components/Schedule";
 const App = () => {
   return (
     <Router>
@@ -15,7 +15,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dash />} />
         <Route path="/task" element={<Task />} /> 
-        <Route path="/schedule" element={<div>Schedule Page</div>} />
+        <Route path="/schedule" element={<Schedule />} />
         <Route path="/profile" element={<div>Profile Page</div>} />
       </Routes>
     </Router>
