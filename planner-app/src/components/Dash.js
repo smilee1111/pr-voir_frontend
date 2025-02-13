@@ -21,7 +21,7 @@ const Dashboard = () => {
       <nav class="navbar">
             <ul>
             <li><Link to="/dashboard" className="active">Home</Link></li>
-            <li><Link to="/task">Tasks</Link></li>
+            <li><Link to="/tasks">Tasks</Link></li>
             <li><Link to="/schedule">Schedule</Link></li>
             <li><Link to="/profile">Profile</Link></li>
             

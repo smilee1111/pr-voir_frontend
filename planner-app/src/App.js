@@ -6,6 +6,8 @@ import Login from "./components/Login";
 import Dash from "./components/Dash";
 import Task from "./components/Task";
 import Schedule from "./components/Schedule";
+import Profile from "./components/Profile";
+
 const App = () => {
   return (
     <Router>
@@ -14,9 +16,9 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dash />} />
-        <Route path="/task" element={<Task />} /> 
+        <Route path="/tasks" element={<Task />} /> 
         <Route path="/schedule" element={<Schedule />} />
-        <Route path="/profile" element={<div>Profile Page</div>} />
+        <Route path="/profile" element={<Profile/>} />
       </Routes>
     </Router>
   );

@@ -35,8 +35,8 @@ const Schedule = () => {
       <nav className="navbar">
         <ul>
           <li><Link to="/dashboard">Home</Link></li>
-          <li><Link to="/tasks" className="active">Tasks</Link></li>
-          <li><Link to="/schedule">Schedule</Link></li>
+          <li><Link to="/tasks">Tasks</Link></li>
+          <li><Link to="/schedule"className="active">Schedule</Link></li>
           <li><Link to="/profile">Profile</Link></li>
         </ul>
         <img src="/planner-graphic.png" alt="Logo" className="logo" />
@@ -44,7 +44,8 @@ const Schedule = () => {
       <h2><em>Incoming events</em></h2>
       <div className="schedule-content">
         <div className="calendar-section">
-          <Calendar onChange={setDate} value={date} />
+        <Calendar onChange={setDate} value={date} className="react-calendar" />
+
         </div>
         <div className="events-section">
           <h3><em>Events:</em></h3>
