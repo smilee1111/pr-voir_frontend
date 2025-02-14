@@ -1,23 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../style/Login.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Username:", username);
-    console.log("Password:", password);
-    navigate("/dashboard"); // Redirect to dashboard
+    
+    try {
+      const response = await axios.post("http://localhost:5001/api/users/login", { username, password });
+
+      // Store JWT token (if needed)
+      localStorage.setItem("token", response.data.token);
+
+      setMessage("Login successful!");
+      setTimeout(() => navigate("/dashboard"), 2000); // Redirect after login
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Login failed");
+    }
   };
 
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Login</h2>
+        {message && <p>{message}</p>}
         <label>Username</label>
         <input
           type="text"
