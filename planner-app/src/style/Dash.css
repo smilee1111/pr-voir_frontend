@@ -33,7 +33,7 @@
     transition: 0.3s ease;
 }
 .navbar a:hover,
-.navbar a:active{
+.navbar ul li a.active{
   color: #ff4081;
     border-bottom: 1px solid rgb(38, 128, 38);
 }

@@ -1,70 +1,207 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import { FaPen } from "react-icons/fa";
+import {
+  getEventsByDate,
+  createEvent,
+  deleteEvent,
+} from "../apis/auth"; // Import API functions
 import "../style/Schedule.css";
 
 const Schedule = () => {
-  const [date, setDate] = useState(new Date());
-  const [events, setEvents] = useState({});
-  const [newEvent, setNewEvent] = useState("");
+  const today = new Date();
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [events, setEvents] = useState({}); // Store events by date
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    startdatetime: "",
+    enddatetime: "",
+    location: "",
+  });
 
-  const handleAddEvent = () => {
-    if (!newEvent.trim()) return;
-    const formattedDate = date.toDateString();
-    setEvents({
-      ...events,
-      [formattedDate]: [...(events[formattedDate] || []), newEvent],
-    });
-    setNewEvent("");
-  };
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
-  const handleEditEvent = (day, index) => {
-    const updatedEvent = prompt("Edit your event:", events[day][index]);
-    if (updatedEvent !== null) {
-      const updatedEvents = [...events[day]];
-      updatedEvents[index] = updatedEvent;
-      setEvents({ ...events, [day]: updatedEvents });
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+  const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+  const firstDayIndex = getFirstDayOfMonth(currentYear, currentMonth);
+  const emptySlots = Array(firstDayIndex).fill(null);
+
+  // Fetch events from backend when month changes
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const eventData = {};
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(currentYear, currentMonth, day);
+        const result = await getEventsByDate(date);
+        eventData[day] = result || [];
+      }
+      setEvents(eventData);
+    };
+    fetchEvents();
+  }, [currentYear, currentMonth]);
+
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(currentYear - 1);
+    } else {
+      setCurrentMonth(currentMonth - 1);
     }
   };
 
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
+
+  const handleDateClick = (day) => {
+    const dateStr = `${months[currentMonth]} ${day}, ${currentYear}`;
+    setSelectedDate(day);
+    setFormData({
+      title: "",
+      description: "",
+      startdatetime: `${currentYear}-${currentMonth + 1}-${day}T12:00`,
+      enddatetime: `${currentYear}-${currentMonth + 1}-${day}T13:00`,
+      location: "",
+    });
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setFormData({ title: "", description: "", startdatetime: "", enddatetime: "", location: "" });
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const eventData = {
+      title: formData.title,
+      description: formData.description,
+      startDateTime: new Date(formData.startdatetime).toISOString(), // Convert to correct format
+      endDateTime: new Date(formData.enddatetime).toISOString(), // Convert to correct format
+      location: formData.location,
+    };
+  
+    const newEvent = await createEvent(eventData);
+  
+    if (!newEvent.error) {
+      setEvents({
+        ...events,
+        [selectedDate]: [...(events[selectedDate] || []), newEvent],
+      });
+      closeModal();
+    } else {
+      alert("Error saving event");
+    }
+  };
+  
+  const handleDeleteEvent = async (eventId, day) => {
+    try {
+      await deleteEvent(eventId); // Pass the eventId to the backend
+      setEvents({
+        ...events,
+        [day]: events[day].filter((event) => event.eventid !== eventId), // Ensure the filter is done on 'eventid' (not 'id')
+      });
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
+  
+
   return (
-    
-    <div className="schedule-container">
+    <div className="schedule-page">
       <nav className="navbar">
         <ul>
           <li><Link to="/dashboard">Home</Link></li>
           <li><Link to="/tasks">Tasks</Link></li>
-          <li><Link to="/schedule"className="active">Schedule</Link></li>
+          <li><Link to="/schedule" className="active">Schedule</Link></li>
           <li><Link to="/profile">Profile</Link></li>
         </ul>
         <img src="/planner-graphic.png" alt="Logo" className="logo" />
       </nav>
-      <h2><em>Incoming events</em></h2>
-      <div className="schedule-content">
-        <div className="calendar-section">
-        <Calendar onChange={setDate} value={date} className="react-calendar" />
 
+      <div className="schedule-container">
+        <div className="calendar-header">
+          <button className="nav-btn" onClick={handlePrevMonth}>◀</button>
+          <h2 className="title">{months[currentMonth]} {currentYear}</h2>
+          <button className="nav-btn" onClick={handleNextMonth}>▶</button>
         </div>
-        <div className="events-section">
-          <h3><em>Events:</em></h3>
-          <ul>
-            {(events[date.toDateString()] || []).map((event, index) => (
-              <li key={index} className="event-item">
-                {event} <FaPen className="edit-icon" onClick={() => handleEditEvent(date.toDateString(), index)} />
-              </li>
+
+        <div className="calendar-grid">
+          <div className="weekdays">
+            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span>
+            <span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+
+          <div className="days">
+            {emptySlots.map((_, index) => (
+              <div key={`empty-${index}`} className="empty-day"></div>
             ))}
-          </ul>
-          <input
-            type="text"
-            placeholder="Add an event..."
-            value={newEvent}
-            onChange={(e) => setNewEvent(e.target.value)}
-          />
-          <button onClick={handleAddEvent}>Add Event</button>
+            {[...Array(daysInMonth)].map((_, index) => {
+              const day = index + 1;
+              const isToday = day === today.getDate() &&
+                              currentMonth === today.getMonth() &&
+                              currentYear === today.getFullYear();
+
+              return (
+                <div key={day} className={`day ${isToday ? "today" : ""}`} onClick={() => handleDateClick(day)}>
+                  {day}
+                  {events[day]?.map((event, eventIndex) => {
+                    console.log(event);  // Log the event to check its structure
+                    return (
+                      <div key={eventIndex} className="event">
+                        {event.title}
+                        <span className="delete-icon" onClick={() => handleDeleteEvent(event.eventid, day)}>🗑</span>
+                      </div>
+                    );
+                  })}
+
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close-btn" onClick={closeModal}>&times;</span>
+            <h3>Add Event for {months[currentMonth]} {selectedDate}, {currentYear}</h3>
+            <form onSubmit={handleSubmit}>
+              <input type="text" name="title" placeholder="Event Title" value={formData.title} onChange={handleChange} required />
+              <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange}></textarea>
+
+              <label>Start Date & Time:</label>
+              <input type="datetime-local" name="startdatetime" value={formData.startdatetime} onChange={handleChange} required />
+
+              <label>End Date & Time:</label>
+              <input type="datetime-local" name="enddatetime" value={formData.enddatetime} onChange={handleChange} required />
+
+              <input type="text" name="location" placeholder="Location" value={formData.location} onChange={handleChange} required />
+
+              <button type="submit" className="submit-btn">Save Event</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
