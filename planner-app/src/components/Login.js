@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { loginUser } from "../apis/auth"; // import loginUser function
 import "../style/Login.css";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");  // Changed from username to email
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -13,13 +13,14 @@ const Login = () => {
     e.preventDefault();
     
     try {
-      const response = await axios.post("http://localhost:5001/api/users/login", { username, password });
+      const response = await loginUser({ email, password });  // Pass email instead of username
 
-      // Store JWT token (if needed)
-      localStorage.setItem("token", response.data.token);
-
-      setMessage("Login successful!");
-      setTimeout(() => navigate("/dashboard"), 2000); // Redirect after login
+      if (response.token) {
+        setMessage("Login successful!");
+        setTimeout(() => navigate("/dashboard"), 2000); // Redirect after login
+      } else {
+        setMessage(response.error || "Login failed");
+      }
     } catch (error) {
       setMessage(error.response?.data?.message || "Login failed");
     }
@@ -30,12 +31,12 @@ const Login = () => {
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Login</h2>
         {message && <p>{message}</p>}
-        <label>Username</label>
+        <label>Email</label> {/* Changed label to Email */}
         <input
-          type="text"
-          placeholder="Enter username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"  // Updated input type to email
+          placeholder="Enter email"
+          value={email}  // Use email state
+          onChange={(e) => setEmail(e.target.value)}  // Set email
         />
 
         <label>Password</label>

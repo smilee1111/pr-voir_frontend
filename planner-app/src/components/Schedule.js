@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  getEventsByDate,
+  getAllEvents,
   createEvent,
   deleteEvent,
 } from "../apis/auth"; // Import API functions
@@ -40,8 +40,9 @@ const Schedule = () => {
       const eventData = {};
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(currentYear, currentMonth, day);
-        const result = await getEventsByDate(date);
-        eventData[day] = result || [];
+        const result = await getAllEvents();  // Adjusted to fetch all events
+        // Filter events by day
+        eventData[day] = result.filter(event => new Date(event.startdatetime).getDate() === day) || [];
       }
       setEvents(eventData);
     };
@@ -94,8 +95,8 @@ const Schedule = () => {
     const eventData = {
       title: formData.title,
       description: formData.description,
-      startDateTime: new Date(formData.startdatetime).toISOString(), // Convert to correct format
-      endDateTime: new Date(formData.enddatetime).toISOString(), // Convert to correct format
+      startdatetime: new Date(formData.startdatetime).toISOString(), // Convert to correct format
+      enddatetime: new Date(formData.enddatetime).toISOString(), // Convert to correct format
       location: formData.location,
     };
   
@@ -123,7 +124,6 @@ const Schedule = () => {
       console.error("Error deleting event:", error);
     }
   };
-  
 
   return (
     <div className="schedule-page">
@@ -164,7 +164,6 @@ const Schedule = () => {
                 <div key={day} className={`day ${isToday ? "today" : ""}`} onClick={() => handleDateClick(day)}>
                   {day}
                   {events[day]?.map((event, eventIndex) => {
-                    console.log(event);  // Log the event to check its structure
                     return (
                       <div key={eventIndex} className="event">
                         {event.title}
@@ -172,7 +171,6 @@ const Schedule = () => {
                       </div>
                     );
                   })}
-
                 </div>
               );
             })}
