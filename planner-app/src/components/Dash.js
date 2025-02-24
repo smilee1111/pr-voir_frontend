@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import "../style/Dash.css"; // Ensure this CSS file exists
 
 const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -14,8 +14,23 @@ const tasks = [
 ];
 
 const Dashboard = () => {
-  const [selectedDay, setSelectedDay] = useState("wednesday");
 
+   const [dropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
+  
+    const navigate=useNavigate();
+  const [selectedDay, setSelectedDay] = useState("wednesday");
+        // Logout function
+        const handleLogout = () => {
+          localStorage.removeItem("userId"); // Remove user from localStorage
+          localStorage.removeItem("token"); // Remove user from localStorage
+          navigate("/login"); // Redirect to login page
+        };
+  
+          // Toggle dropdown visibility
+      const toggleDropdown = () => {
+        setDropdownVisible(!dropdownVisible);
+      };
+    
   return (
     <div className="dashboard">
       <nav class="navbar">
@@ -26,7 +41,22 @@ const Dashboard = () => {
             <li><Link to="/profile">Profile</Link></li>
             
             </ul>
-            <img src="/planner-graphic.png" alt="Logo" className="logo" />
+                 <div className="navbar-right">
+          {/* Logo and dropdown */}
+          <div className="logo-container">
+            <img
+              src="/planner-graphic.png"
+              alt="Logo"
+              className="logo"
+              onClick={toggleDropdown} // Toggle dropdown on logo click
+            />
+            {dropdownVisible && (
+              <div className="dropdown-menu">
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
         </nav>
 
       <h1>What's going on today?</h1>

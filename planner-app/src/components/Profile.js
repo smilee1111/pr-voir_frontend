@@ -1,8 +1,26 @@
-import React from "react";
+import React,{ useState, useEffect }  from "react";
 import "../style/Profile.css";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 
 const Profile = () => {
+
+  const [dropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
+
+  const navigate=useNavigate();
+
+      // Logout function
+      const handleLogout = () => {
+        localStorage.removeItem("userId"); // Remove user from localStorage
+        localStorage.removeItem("token"); // Remove user from localStorage
+        navigate("/login"); // Redirect to login page
+      };
+
+        // Toggle dropdown visibility
+    const toggleDropdown = () => {
+      setDropdownVisible(!dropdownVisible);
+    };
+  
+    
   return (
     
     <div className="profile-container">
@@ -13,7 +31,22 @@ const Profile = () => {
                 <li><Link to="/schedule">Schedule</Link></li>
                 <li><Link to="/profile" className="active">Profile</Link></li>
               </ul>
-              <img src="/planner-graphic.png" alt="Logo" className="logo" />
+              <div className="navbar-right">
+          {/* Logo and dropdown */}
+          <div className="logo-container">
+            <img
+              src="/planner-graphic.png"
+              alt="Logo"
+              className="logo"
+              onClick={toggleDropdown} // Toggle dropdown on logo click
+            />
+            {dropdownVisible && (
+              <div className="dropdown-menu">
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
             </nav>
       <div className="profile-card">
         <div className="tasks-section">

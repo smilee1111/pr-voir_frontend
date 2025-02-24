@@ -2,7 +2,6 @@
     padding: 20px;
     font-family: Arial, sans-serif;
   }
-
   .navbar {
     display: flex;
     justify-content: space-between;
@@ -18,31 +17,54 @@
     margin: 0;
     gap: 20px;
   }
-  .navbar ul li{
+  
+  .navbar ul li {
     display: inline-block;
     margin: 0 15px;
-}
-
-  .navbar ul li a{
+  }
+  
+  .navbar ul li a {
     font-size: 18px;
-    color:rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
     font-weight: 500;
-    margin:0 20px;
+    margin: 0 20px;
     text-decoration: none;
     border-bottom: 3px solid transparent;
     transition: 0.3s ease;
-}
-.navbar a:hover,
-.navbar ul li a.active{
-  color: #ff4081;
+  }
+  
+  .navbar a:hover,
+  .navbar ul li a.active {
+    color: #ff4081;
     border-bottom: 1px solid rgb(38, 128, 38);
-}
-
-.logo {
-  width: 40px; /* Adjust size as needed */
-  height: 40px;
-  border-radius: 50%; /* Make it circular if needed */
-}
+  }
+  
+  .logo {
+    width: 40px; /* Adjust size as needed */
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: right;
+  }
+  
+  .logout-btn {
+    padding: 5px 15px;
+    background-color: #ff4081;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 20px;
+  }
+  
+  .logout-btn:hover {
+    background-color: #e73661;
+  }
+  
   .day-selector {
     display: flex;
     gap: 10px;

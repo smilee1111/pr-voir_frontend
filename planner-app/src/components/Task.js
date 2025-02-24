@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { getAllTasks, createTask, updateTask,deleteTask } from "../apis/auth"; // Import API functions
+import { Link, useNavigate } from "react-router-dom";
+import { getAllTasks, createTask, updateTask, deleteTask } from "../apis/auth"; // Import API functions
 import "../style/Task.css";
 
 const TaskBoard = () => {
   const [tasks, setTasks] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
-
+  const [dropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
   // Task form state
   const [formData, setFormData] = useState({
     title: "",
@@ -15,22 +15,30 @@ const TaskBoard = () => {
     duetime: "",
     status: "To-Do", // Default category
     priority: "Low",
-    
   });
+  const navigate = useNavigate();
 
   // Fetch tasks when the component loads
   useEffect(() => {
     const fetchTasks = async () => {
-      const data = await getAllTasks();
+      const userId = localStorage.getItem("userId"); // Get current user's ID
+      if (!userId) {
+        console.error("User not logged in");
+        return;
+      }
+
+      // Get tasks for the current user
+      const data = await getAllTasks(userId); // Pass userId to API
       console.log("Fetched Tasks:", data); // Log to ensure tasks are fetched correctly
-      setTasks(data);
       if (!data.error) {
-        console.log("Fetched Tasks:", data); // Log to ensure tasks are fetched correctly
-        setTasks(data);
+        // Filter tasks to only show the current user's tasks
+        setTasks(data.filter((task) => task.userId === parseInt(userId))); // Ensure the userId is the same type (number)
+      } else {
+        console.error("Error fetching tasks:", data.error);
       }
     };
     fetchTasks();
-  }, []);
+  }, []); // Empty dependency array ensures it runs once when the component mounts
 
   // Open form for adding a new task
   const openAddForm = (status) => {
@@ -40,7 +48,6 @@ const TaskBoard = () => {
       duetime: "",
       status: status || "To-Do", // Default to "To-Do" if category is undefined
       priority: "Low",
-     
     });
     setEditMode(false);
     setShowForm(true);
@@ -52,62 +59,69 @@ const TaskBoard = () => {
       console.error("Task ID is missing");
       return;
     }
-  
+
     setFormData(task); // Ensures taskid is included
     setEditMode(true);
     setShowForm(true);
   };
-  
-  
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  // Get user ID from localStorage (assuming it's stored as 'userId')
-  const userId = localStorage.getItem("userId");
-
-
-  console.log("Form Data Before Submit:", formData); // Debugging log
-
-  const taskData = {
-    title: formData.title,
-    description: formData.description,
-    duetime: formData.duetime,
-    status: formData.status?.toLowerCase() || formData.status, // Ensure status is correctly formatted
-    priority: formData.priority,
-    userId: userId, // Attach the user ID to associate the task with the logged-in user
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("userId"); // Remove user from localStorage
+    localStorage.removeItem("token"); // Remove user from localStorage
+    navigate("/login"); // Redirect to login page
   };
 
-  if (editMode) {
-    const updatedTask = await updateTask(formData.taskid, taskData);
-    if (!updatedTask.error) {
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.taskid === formData.taskid ? updatedTask : t))
-      );
-    }
-  } else {
-    const newTask = await createTask(taskData);
-    if (!newTask.error) {
-      const data = await getAllTasks();
-      setTasks(data);
-    }
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  setShowForm(false);
-};
+    const userId = localStorage.getItem("userId");
 
-    // Handle task deletion
-    const handleDelete = async (taskid) => {
-      const confirmDelete = window.confirm("Are you sure you want to delete this task?");
-      if (!confirmDelete) return;
-  
-      const response = await deleteTask(taskid);
-      if (!response.error) {
-        setTasks((prevTasks) => prevTasks.filter((task) => task.taskid !== taskid));
-      }
+    console.log("Form Data Before Submit:", formData); // Debugging log
+
+    const taskData = {
+      title: formData.title,
+      description: formData.description,
+      duetime: formData.duetime,
+      status: formData.status?.toLowerCase() || formData.status, // Ensure status is correctly formatted
+      priority: formData.priority,
+      userId: userId, // Attach the user ID to associate the task with the logged-in user
     };
-  
-  
-  
+
+    if (editMode) {
+      const updatedTask = await updateTask(formData.taskid, taskData);
+      if (!updatedTask.error) {
+        setTasks((prevTasks) =>
+          prevTasks.map((t) => (t.taskid === formData.taskid ? updatedTask : t))
+        );
+      }
+    } else {
+      const newTask = await createTask(taskData);
+      if (!newTask.error) {
+        const data = await getAllTasks(userId); // Ensure to fetch tasks for the current user
+        setTasks(data.filter((task) => task.userId === parseInt(userId))); // Filter tasks by user ID
+      }
+    }
+
+    setShowForm(false);
+  };
+
+  // Handle task deletion
+  const handleDelete = async (taskid) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this task?");
+    if (!confirmDelete) return;
+
+    const response = await deleteTask(taskid);
+    if (!response.error) {
+      setTasks((prevTasks) => prevTasks.filter((task) => task.taskid !== taskid));
+    }
+  };
+
+  // Toggle dropdown visibility
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
   return (
     <div className="tasks-page">
       {/* Navbar */}
@@ -118,7 +132,22 @@ const handleSubmit = async (e) => {
           <li><Link to="/schedule">Schedule</Link></li>
           <li><Link to="/profile">Profile</Link></li>
         </ul>
-        <img src="/planner-graphic.png" alt="Logo" className="logo" />
+        <div className="navbar-right">
+          {/* Logo and dropdown */}
+          <div className="logo-container">
+            <img
+              src="/planner-graphic.png"
+              alt="Logo"
+              className="logo"
+              onClick={toggleDropdown} // Toggle dropdown on logo click
+            />
+            {dropdownVisible && (
+              <div className="dropdown-menu">
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
       </nav>
 
       <h2>What you need to get done.</h2>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import {
   getAllEvents,
   createEvent,
   deleteEvent,
 } from "../apis/auth"; // Import API functions
 import "../style/Schedule.css";
+
 
 const Schedule = () => {
   const today = new Date();
@@ -14,6 +15,7 @@ const Schedule = () => {
   const [events, setEvents] = useState({}); // Store events by date
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -21,7 +23,7 @@ const Schedule = () => {
     enddatetime: "",
     location: "",
   });
-
+  const navigate=useNavigate();
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -37,17 +39,24 @@ const Schedule = () => {
   // Fetch events from backend when month changes
   useEffect(() => {
     const fetchEvents = async () => {
+      const userId = localStorage.getItem("userId"); // Get userId from localStorage
+      if (!userId) {
+        alert("User not logged in.");
+        return;
+      }
+  
+      const result = await getAllEvents();
+      const filteredEvents = result.filter(event => event.userId === parseInt(userId));
+  
       const eventData = {};
       for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(currentYear, currentMonth, day);
-        const result = await getAllEvents();  // Adjusted to fetch all events
-        // Filter events by day
-        eventData[day] = result.filter(event => new Date(event.startdatetime).getDate() === day) || [];
+        eventData[day] = filteredEvents.filter(event => new Date(event.startdatetime).getDate() === day) || [];
       }
       setEvents(eventData);
     };
     fetchEvents();
   }, [currentYear, currentMonth]);
+  
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -68,17 +77,17 @@ const Schedule = () => {
   };
 
   const handleDateClick = (day) => {
-    const dateStr = `${months[currentMonth]} ${day}, ${currentYear}`;
     setSelectedDate(day);
     setFormData({
       title: "",
       description: "",
-      startdatetime: `${currentYear}-${currentMonth + 1}-${day}T12:00`,
-      enddatetime: `${currentYear}-${currentMonth + 1}-${day}T13:00`,
+      startdatetime: "12:00", // Default time
+      enddatetime: "13:00",   // Default time
       location: "",
     });
     setShowModal(true);
   };
+  
 
   const closeModal = () => {
     setShowModal(false);
@@ -89,41 +98,79 @@ const Schedule = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+
+      // Logout function
+      const handleLogout = () => {
+        localStorage.removeItem("userId"); // Remove user from localStorage
+        localStorage.removeItem("token"); // Remove user from localStorage
+        navigate("/login"); // Redirect to login page
+      };
+    
+    
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    const selectedFullDate = new Date(currentYear, currentMonth, selectedDate);
+    const [startHours, startMinutes] = formData.startdatetime.split(":");
+    const [endHours, endMinutes] = formData.enddatetime.split(":");
+  
+    const startDateTime = new Date(selectedFullDate);
+    startDateTime.setHours(parseInt(startHours), parseInt(startMinutes), 0);
+  
+    const endDateTime = new Date(selectedFullDate);
+    endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0);
+  
+    // Get userId from localStorage or authentication state
+    const userId = localStorage.getItem("userId"); // Ensure this is stored at login
+  
+    if (!userId) {
+      alert("User not logged in.");
+      return;
+    }
   
     const eventData = {
       title: formData.title,
       description: formData.description,
-      startdatetime: new Date(formData.startdatetime).toISOString(), // Convert to correct format
-      enddatetime: new Date(formData.enddatetime).toISOString(), // Convert to correct format
+      startdatetime: startDateTime.toISOString(),
+      enddatetime: endDateTime.toISOString(),
       location: formData.location,
+      userId: parseInt(userId), // Include userId
     };
   
-    const newEvent = await createEvent(eventData);
+    try {
+      const newEvent = await createEvent(eventData);
   
-    if (!newEvent.error) {
-      setEvents({
-        ...events,
-        [selectedDate]: [...(events[selectedDate] || []), newEvent],
-      });
-      closeModal();
-    } else {
-      alert("Error saving event");
+      if (!newEvent.error) {
+        setEvents({
+          ...events,
+          [selectedDate]: [...(events[selectedDate] || []), newEvent],
+        });
+        closeModal();
+      } else {
+        console.error("Error saving event:", newEvent.error);
+        alert("Error saving event: " + newEvent.error);
+      }
+    } catch (error) {
+      console.error("Error submitting event:", error);
+      alert("Error submitting event. Please try again.");
     }
   };
   
-  const handleDeleteEvent = async (eventId, day) => {
+  const handleDeleteEvent = async (eventid, day) => {
     try {
-      await deleteEvent(eventId); // Pass the eventId to the backend
+      await deleteEvent(eventid); // Pass the eventId to the backend
       setEvents({
         ...events,
-        [day]: events[day].filter((event) => event.eventid !== eventId), // Ensure the filter is done on 'eventid' (not 'id')
+        [day]: events[day].filter((event) => event.eventid !== eventid), // Ensure the filter is done on 'eventid' (not 'id')
       });
     } catch (error) {
       console.error("Error deleting event:", error);
     }
   };
+     // Toggle dropdown visibility
+     const toggleDropdown = () => {
+      setDropdownVisible(!dropdownVisible);
+    };
 
   return (
     <div className="schedule-page">
@@ -134,7 +181,22 @@ const Schedule = () => {
           <li><Link to="/schedule" className="active">Schedule</Link></li>
           <li><Link to="/profile">Profile</Link></li>
         </ul>
-        <img src="/planner-graphic.png" alt="Logo" className="logo" />
+        <div className="navbar-right">
+          {/* Logo and dropdown */}
+          <div className="logo-container">
+            <img
+              src="/planner-graphic.png"
+              alt="Logo"
+              className="logo"
+              onClick={toggleDropdown} // Toggle dropdown on logo click
+            />
+            {dropdownVisible && (
+              <div className="dropdown-menu">
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
       </nav>
 
       <div className="schedule-container">
@@ -187,11 +249,12 @@ const Schedule = () => {
               <input type="text" name="title" placeholder="Event Title" value={formData.title} onChange={handleChange} required />
               <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange}></textarea>
 
-              <label>Start Date & Time:</label>
-              <input type="datetime-local" name="startdatetime" value={formData.startdatetime} onChange={handleChange} required />
+              <label>Start Time:</label>
+              <input type="time" name="startdatetime" value={formData.startdatetime} onChange={handleChange} required />
 
-              <label>End Date & Time:</label>
-              <input type="datetime-local" name="enddatetime" value={formData.enddatetime} onChange={handleChange} required />
+              <label>End Time:</label>
+              <input type="time" name="enddatetime" value={formData.enddatetime} onChange={handleChange} required />
+
 
               <input type="text" name="location" placeholder="Location" value={formData.location} onChange={handleChange} required />
 

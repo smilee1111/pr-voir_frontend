@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { registerUser } from "../apis/auth"; // Import the registerUser function from the auth.js file
 import "../style/Register.css";
 
 const Register = () => {
@@ -8,7 +8,7 @@ const Register = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-  phonenumber: null,
+    phonenumber: null,
     password: "",
   });
   const [message, setMessage] = useState("");
@@ -16,22 +16,23 @@ const Register = () => {
   // Handle input change
   const handleChange = (e) => {
     let { name, value } = e.target;
-  
+
     if (name === "phonenumber") {
       value = value ? parseInt(value, 10) : null; // Convert to integer or keep it null
     }
-  
+
     setFormData({ ...formData, [name]: value });
   };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5001/api/users/register", formData);
-      setMessage(response.data.message);
+      const response = await registerUser(formData); // Use registerUser from auth.js
+      setMessage(response.message || "Registration successful");
       setTimeout(() => navigate("/login"), 2000); // Redirect after success
     } catch (error) {
-      setMessage(error.response?.data?.message || "Registration failed");
+      setMessage(error.error || "Registration failed");
     }
   };
 
@@ -40,10 +41,34 @@ const Register = () => {
       <div className="register-form">
         <h2>Create your planner!</h2>
         <form onSubmit={handleSubmit}>
-          <input type="text" name="username" placeholder="Enter your username" onChange={handleChange} required />
-          <input type="email" name="email" placeholder="Enter your email" onChange={handleChange} required />
-          <input type="tel" name="phonenumber" placeholder="Enter your phone no." onChange={handleChange} required />
-          <input type="password" name="password" placeholder="Enter password" onChange={handleChange} required />
+          <input
+            type="text"
+            name="username"
+            placeholder="Enter your username"
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="tel"
+            name="phonenumber"
+            placeholder="Enter your phone no."
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            onChange={handleChange}
+            required
+          />
           <button type="submit">SIGN UP</button>
         </form>
         {message && <p>{message}</p>}
