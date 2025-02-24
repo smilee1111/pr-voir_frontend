@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getAllTasks, createTask, updateTask } from "../apis/auth"; // Import API functions
+import { getAllTasks, createTask, updateTask,deleteTask } from "../apis/auth"; // Import API functions
 import "../style/Task.css";
 
 const TaskBoard = () => {
@@ -10,18 +10,20 @@ const TaskBoard = () => {
 
   // Task form state
   const [formData, setFormData] = useState({
-    id: null,
     title: "",
     description: "",
-    dueTime: "",
+    duetime: "",
+    status: "To-Do", // Default category
     priority: "Low",
-    category: "To-Do", // Default category
+    
   });
 
   // Fetch tasks when the component loads
   useEffect(() => {
     const fetchTasks = async () => {
       const data = await getAllTasks();
+      console.log("Fetched Tasks:", data); // Log to ensure tasks are fetched correctly
+      setTasks(data);
       if (!data.error) {
         console.log("Fetched Tasks:", data); // Log to ensure tasks are fetched correctly
         setTasks(data);
@@ -31,14 +33,14 @@ const TaskBoard = () => {
   }, []);
 
   // Open form for adding a new task
-  const openAddForm = (category) => {
+  const openAddForm = (status) => {
     setFormData({
-      id: null,
       title: "",
       description: "",
-      dueTime: "",
+      duetime: "",
+      status: status || "To-Do", // Default to "To-Do" if category is undefined
       priority: "Low",
-      category: category || "To-Do", // Default to "To-Do" if category is undefined
+     
     });
     setEditMode(false);
     setShowForm(true);
@@ -46,7 +48,6 @@ const TaskBoard = () => {
 
   const openEditForm = (task) => {
     console.log("Opening Edit Form for task:", task);
-  
     if (!task.taskid) { // Corrected to use taskid
       console.error("Task ID is missing");
       return;
@@ -58,38 +59,53 @@ const TaskBoard = () => {
   };
   
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    console.log("Form Data Before Submit:", formData); // Log the entire form data
-  
-    if (!formData.taskid) { // Use taskid instead of id
-      console.error("Task ID is undefined");
-      return; // Prevent submission if ID is missing
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Get user ID from localStorage (assuming it's stored as 'userId')
+  const userId = localStorage.getItem("userId");
+
+
+  console.log("Form Data Before Submit:", formData); // Debugging log
+
+  const taskData = {
+    title: formData.title,
+    description: formData.description,
+    duetime: formData.duetime,
+    status: formData.status?.toLowerCase() || formData.status, // Ensure status is correctly formatted
+    priority: formData.priority,
+    userId: userId, // Attach the user ID to associate the task with the logged-in user
+  };
+
+  if (editMode) {
+    const updatedTask = await updateTask(formData.taskid, taskData);
+    if (!updatedTask.error) {
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => (t.taskid === formData.taskid ? updatedTask : t))
+      );
     }
+  } else {
+    const newTask = await createTask(taskData);
+    if (!newTask.error) {
+      const data = await getAllTasks();
+      setTasks(data);
+    }
+  }
+
+  setShowForm(false);
+};
+
+    // Handle task deletion
+    const handleDelete = async (taskid) => {
+      const confirmDelete = window.confirm("Are you sure you want to delete this task?");
+      if (!confirmDelete) return;
   
-    const taskData = {
-      ...formData,
-      status: formData.category?.toLowerCase() || formData.status, // Ensure status is correctly passed
+      const response = await deleteTask(taskid);
+      if (!response.error) {
+        setTasks((prevTasks) => prevTasks.filter((task) => task.taskid !== taskid));
+      }
     };
   
-    if (editMode) {
-      const updatedTask = await updateTask(formData.taskid, taskData); // Use taskid instead of id
-      if (!updatedTask.error) {
-        setTasks((prevTasks) =>
-          prevTasks.map((t) => (t.taskid === formData.taskid ? updatedTask : t)) // Update taskid instead of id
-        );
-      }
-    } else {
-      const newTask = await createTask(taskData);
-      if (!newTask.error) {
-        const data = await getAllTasks();
-        setTasks(data);
-      }
-    }
-  
-    setShowForm(false);
-  };
   
   
   return (
@@ -109,24 +125,25 @@ const TaskBoard = () => {
 
       {/* Task Board */}
       <div className="task-board">
-        {["To-Do", "Doing", "Done"].map((category) => (
-          <div key={category} className="task-column">
-            <h3 className={category.toLowerCase()}>{category}</h3>
+        {["to-Do", "doing", "done"].map((status) => (
+          <div key={status} className="task-column">
+            <h3 className={status.toLowerCase()}>{status}</h3>
             {tasks
-              .filter((task) => task.status === category.toLowerCase()) // Change task.id to task.taskid if needed
+              .filter((task) => task.status === status.toLowerCase()) // Change task.id to task.taskid if needed
               .map((task) => (
                 <div key={task.taskid} className="task-card"> {/* Update task.id to task.taskid */}
                   <div>
                     <strong>{task.title}</strong>
                   </div>
                   <div>Description: {task.description}</div>
-                  <div>Due: {task.dueTime}</div>
+                  <div>Due: {task.duetime}</div>
                   <div>Priority: {task.priority}</div>
                   <button onClick={() => openEditForm(task)}>✏️ Edit</button>
+                  <button onClick={() => handleDelete(task.taskid)} className="delete-btn">🗑️ Delete</button>
                 </div>
               ))}
 
-            <button className="add-task-btn" onClick={() => openAddForm(category)}>
+            <button className="add-task-btn" onClick={() => openAddForm(status)}>
               + Add new task
             </button>
           </div>
@@ -157,8 +174,8 @@ const TaskBoard = () => {
               <label>Due Time</label>
               <input
                 type="time"
-                value={formData.dueTime}
-                onChange={(e) => setFormData({ ...formData, dueTime: e.target.value })}
+                value={formData.duetime}
+                onChange={(e) => setFormData({ ...formData, duetime: e.target.value })}
                 required
               />
 
@@ -172,14 +189,14 @@ const TaskBoard = () => {
                 <option value="High">High</option>
               </select>
 
-              <label>Category</label>
+              <label>Status</label>
               <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               >
-                <option value="To-Do">To-Do</option>
-                <option value="Doing">Doing</option>
-                <option value="Done">Done</option>
+                <option value="to-do">To-Do</option>
+                <option value="doing">Doing</option>
+                <option value="done">Done</option>
               </select>
 
               <div className="modal-buttons">

@@ -29,7 +29,7 @@ const Register = () => {
     try {
       const response = await axios.post("http://localhost:5001/api/users/register", formData);
       setMessage(response.data.message);
-      setTimeout(() => navigate("/dashboard"), 2000); // Redirect after success
+      setTimeout(() => navigate("/login"), 2000); // Redirect after success
     } catch (error) {
       setMessage(error.response?.data?.message || "Registration failed");
     }

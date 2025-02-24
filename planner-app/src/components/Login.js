@@ -11,11 +11,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      const response = await loginUser({ email, password });  // Pass email instead of username
+      const response = await loginUser({ email, password });
 
       if (response.token) {
+        localStorage.setItem("token", response.token); // Store token
+        localStorage.setItem("userId", response.userId); // Store userId
+
         setMessage("Login successful!");
         setTimeout(() => navigate("/dashboard"), 2000); // Redirect after login
       } else {
