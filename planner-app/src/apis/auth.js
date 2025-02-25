@@ -147,6 +147,21 @@ export const updateEvent = async (id, eventData) => {
         return { error: "Event update failed" };
     }
 };
+// =======================
+//  EVENT MANAGEMENT APIS
+// =======================
+
+export const getEventsForDate = async (date) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/event/getEventsForDate`, {
+            params: { date }, 
+            headers: getAuthHeaders(),
+        });
+        return response.data;
+    } catch (error) {
+        return { error: "Failed to fetch events for the date" };
+    }
+};
 
 export const deleteEvent = async (id) => {
     try {
