@@ -11,6 +11,8 @@ const Dashboard = () => {
   const [selectedDay, setSelectedDay] = useState(new Date().getDay()); // Default to today's weekday index
   const [tasks, setTasks] = useState({ todo: [], doing: [], done: [] });
 
+  const userId = localStorage.getItem("userId"); // Fetch userId from localStorage
+
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -27,7 +29,7 @@ const Dashboard = () => {
   // Fetch tasks when a day is selected
   const handleDayClick = async (dayIndex) => {
     setSelectedDay(dayIndex); // Update the selected day
-    const fetchedTasks = await getTasksByDay(dayIndex); // Fetch tasks for the selected day
+    const fetchedTasks = await getTasksByDay(dayIndex, userId); // Fetch tasks for the selected day and current user
 
     // Group tasks by status
     const groupedTasks = {
@@ -41,8 +43,12 @@ const Dashboard = () => {
 
   // Fetch tasks when component loads (default to today's tasks)
   useEffect(() => {
-    handleDayClick(selectedDay);
-  }, []); // Ensure this effect runs once on component mount
+    if (userId) {
+      handleDayClick(selectedDay); // Ensure this effect runs once on component mount
+    } else {
+      navigate("/landing"); // If user is not logged in, redirect to landing page
+    }
+  }, [selectedDay, userId]); // Ensure this effect runs once on component mount
 
   return (
     <div className="dashboard">

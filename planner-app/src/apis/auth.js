@@ -115,14 +115,12 @@ export const getTasksByUser = async (userId) => {
         return { error: error.response?.data || "Failed to fetch tasks" };
     }
 };
-export const getTasksByDay = async (dayIndex) => {
+export const getTasksByDay = async (dayIndex, userId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/task/getTasksByDay/${dayIndex}`, {
-        headers: getAuthHeaders(),
-      });
+      const response = await axios.get(`/task/getTasksByDay/${dayIndex}?userId=${userId}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching tasks for the day:", error);
+      console.error("Error fetching tasks by day:", error);
       return [];
     }
   };
