@@ -109,6 +109,7 @@ const Schedule = () => {
   const handleLogout = () => {
     localStorage.removeItem("userId"); // Remove user from localStorage
     localStorage.removeItem("token"); // Remove user from localStorage
+    localStorage.removeItem("username"); // Remove username from localStorage
     navigate("/login"); // Redirect to login page
   };
   

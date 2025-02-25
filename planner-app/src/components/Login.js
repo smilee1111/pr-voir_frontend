@@ -18,6 +18,8 @@ const Login = () => {
       if (response.token) {
         localStorage.setItem("token", response.token); // Store token
         localStorage.setItem("userId", response.userId); // Store userId
+        localStorage.setItem("username", response.username);
+
 
         setMessage("Login successful!");
         setTimeout(() => navigate("/dashboard"), 2000); // Redirect after login
