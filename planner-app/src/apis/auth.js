@@ -115,12 +115,17 @@ export const getTasksByUser = async (userId) => {
         return { error: error.response?.data || "Failed to fetch tasks" };
     }
 };
-export const getTasksByDay = async (dayIndex, userId) => {
+export const getTasksByDay = async (dayIndex) => {
+    const userId = localStorage.getItem("userId"); // Assuming the userId is saved in localStorage
     try {
-      const response = await axios.get(`/task/getTasksByDay/${dayIndex}?userId=${userId}`);
+      const response = await axios.get(`${API_BASE_URL}/task/getTasksByDay/${dayIndex}`, {
+        params: {
+          userId, // Pass the userId as a query parameter
+        },
+      });
       return response.data;
     } catch (error) {
-      console.error("Error fetching tasks by day:", error);
+      console.error('Error fetching tasks by day:', error);
       return [];
     }
   };
