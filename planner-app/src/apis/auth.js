@@ -115,6 +115,18 @@ export const getTasksByUser = async (userId) => {
         return { error: error.response?.data || "Failed to fetch tasks" };
     }
 };
+export const getTasksByDay = async (dayIndex) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/task/getTasksByDay/${dayIndex}`, {
+        headers: getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching tasks for the day:", error);
+      return [];
+    }
+  };
+  
 
 // =======================
 //  EVENT MANAGEMENT APIS

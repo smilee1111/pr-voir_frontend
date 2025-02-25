@@ -1,55 +1,65 @@
-import React, { useState } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../style/Dash.css"; // Ensure this CSS file exists
+import { getTasksByDay } from "../apis/auth";
 
 const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
-const tasks = [
-  { id: 1, category: "To-Do", text: "Wednesday To-Do Tasks List", color: "#DCD6F7" },
-  { id: 1, category: "Done", text: "Wednesday Done Tasks List", color: "#F8A488" },
-  { id: 2, category: "Events", text: "Wednesday Events List", color: "#F4A8B1" },
-  { id: 2, category: "Marked Done Events", text: "Wednesday Marked Done Events List", color: "#FDF4E3" },
-  { id: 2, category: "Other", text: "Other", color: "#1E1E1E", textColor: "#FFF" },
-  { id: 3, category: "Other", text: "Other", color: "#9D93F7" },
-];
-
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(new Date().getDay()); // Default to today's weekday index
+  const [tasks, setTasks] = useState({ todo: [], doing: [], done: [] });
 
-   const [dropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
-  
-    const navigate=useNavigate();
-  const [selectedDay, setSelectedDay] = useState("wednesday");
-        // Logout function
-        const handleLogout = () => {
-          localStorage.removeItem("userId"); // Remove user from localStorage
-          localStorage.removeItem("token"); // Remove user from localStorage
-          localStorage.removeItem("username"); // Remove username from localStorage
-          navigate("/login"); // Redirect to login page
-        };
-  
-          // Toggle dropdown visibility
-      const toggleDropdown = () => {
-        setDropdownVisible(!dropdownVisible);
-      };
-    
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate("/login");
+  };
+
+  // Toggle dropdown visibility
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  // Fetch tasks when a day is selected
+  const handleDayClick = async (dayIndex) => {
+    setSelectedDay(dayIndex); // Update the selected day
+    const fetchedTasks = await getTasksByDay(dayIndex); // Fetch tasks for the selected day
+
+    // Group tasks by status
+    const groupedTasks = {
+      todo: fetchedTasks.filter(task => task.status === "to-do"),
+      doing: fetchedTasks.filter(task => task.status === "doing"),
+      done: fetchedTasks.filter(task => task.status === "done")
+    };
+
+    setTasks(groupedTasks); // Update tasks state with grouped tasks
+  };
+
+  // Fetch tasks when component loads (default to today's tasks)
+  useEffect(() => {
+    handleDayClick(selectedDay);
+  }, []); // Ensure this effect runs once on component mount
+
   return (
     <div className="dashboard">
-      <nav class="navbar">
-            <ul>
-            <li><Link to="/dashboard" className="active">Home</Link></li>
-            <li><Link to="/tasks">Tasks</Link></li>
-            <li><Link to="/schedule">Schedule</Link></li>
-            <li><Link to="/profile">Profile</Link></li>
-            
-            </ul>
-                 <div className="navbar-right">
-          {/* Logo and dropdown */}
+      <nav className="navbar">
+        <ul>
+          <li><Link to="/dashboard" className="active">Home</Link></li>
+          <li><Link to="/tasks">Tasks</Link></li>
+          <li><Link to="/schedule">Schedule</Link></li>
+          <li><Link to="/profile">Profile</Link></li>
+        </ul>
+        <div className="navbar-right">
           <div className="logo-container">
             <img
               src="/planner-graphic.png"
               alt="Logo"
               className="logo"
-              onClick={toggleDropdown} // Toggle dropdown on logo click
+              onClick={toggleDropdown}
             />
             {dropdownVisible && (
               <div className="dropdown-menu">
@@ -58,16 +68,16 @@ const Dashboard = () => {
             )}
           </div>
         </div>
-        </nav>
+      </nav>
 
       <h1>What's going on today?</h1>
 
       <div className="day-selector">
-        {days.map((day) => (
+        {days.map((day, index) => (
           <button
             key={day}
-            className={day === selectedDay ? "selected" : ""}
-            onClick={() => setSelectedDay(day)}
+            className={index === selectedDay ? "selected" : ""}
+            onClick={() => handleDayClick(index)}
           >
             {day}
           </button>
@@ -75,101 +85,71 @@ const Dashboard = () => {
       </div>
 
       <div className="task-grid">
-        {tasks.map((task) => (
-          <div
-            key={task.text}
-            className="task-card"
-            style={{ backgroundColor: task.color, color: task.textColor || "#000" }}
-          >
-            <span className="task-id">{task.id}</span>
-            <p>{task.text}</p>
+        {/* To-Do Section */}
+        <div className="task-section">
+          <h3>To-Do Tasks</h3>
+          <div className="task-container">
+            {tasks.todo.length > 0 ? (
+              tasks.todo.map((task) => (
+                <div
+                  key={task.taskid}
+                  className="task-card"
+                >
+                  <p>{task.title}</p>
+                </div>
+              ))
+            ) : (
+              <div className="no-task-message">
+                No To-Do tasks for {days[selectedDay]}.
+              </div>
+            )}
           </div>
-        ))}
+        </div>
+
+        {/* Doing Section */}
+        <div className="task-section">
+          <h3>Doing Tasks</h3>
+          <div className="task-container">
+            {tasks.doing.length > 0 ? (
+              tasks.doing.map((task) => (
+                <div
+                  key={task.taskid}
+                  className="task-card"
+                >
+                  <p>{task.title}</p>
+                </div>
+              ))
+            ) : (
+              <div className="no-task-message">
+                No Doing tasks for {days[selectedDay]}.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Done Section */}
+        <div className="task-section">
+          <h3>Done Tasks</h3>
+          <div className="task-container">
+            {tasks.done.length > 0 ? (
+              tasks.done.map((task) => (
+                <div
+                  key={task.taskid}
+                  className="task-card"
+                >
+                  <p>{task.title}</p>
+                </div>
+              ))
+            ) : (
+              <div className="no-task-message">
+                No Done tasks for {days[selectedDay]}.
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Dashboard;
-
-
-
-
-// import React, { useState, useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import axios from "axios"; // Install axios if not installed: npm install axios
-// import "./Dash.css";
-
-// const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-// const Dash = () => {
-//   const [selectedDay, setSelectedDay] = useState("Wednesday"); // Default to Wednesday
-//   const [tasks, setTasks] = useState([]); // Stores tasks fetched from the backend
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-
-//   // Fetch tasks from backend
-//   useEffect(() => {
-//     const fetchTasks = async () => {
-//       setLoading(true);
-//       try {
-//         const response = await axios.get(`http://localhost:5000/api/tasks?day=${selectedDay}`);
-//         setTasks(response.data);
-//         setError(null);
-//       } catch (err) {
-//         setError("Failed to load tasks");
-//         console.error(err);
-//       }
-//       setLoading(false);
-//     };
-
-//     fetchTasks();
-//   }, [selectedDay]); // Runs when selectedDay changes
-
-//   return (
-//     <div className="dashboard">
-//       <nav className="nav">
-//         <Link to="/">Home</Link>
-//         <Link to="/tasks">Tasks</Link>
-//         <Link to="/schedule">Schedule</Link>
-//         <Link to="/profile">Profile</Link>
-//       </nav>
-
-//       <h2>What's going on today?</h2>
-
-//       <div className="day-selector">
-//         {daysOfWeek.map((day) => (
-//           <button
-//             key={day}
-//             className={selectedDay === day ? "active" : ""}
-//             onClick={() => setSelectedDay(day)}
-//           >
-//             {day.toLowerCase()}
-//           </button>
-//         ))}
-//       </div>
-
-//       {loading ? <p>Loading...</p> : error ? <p>{error}</p> : null}
-
-//       <div className="task-container">
-//         {tasks.map((task) => (
-//           <div
-//             key={task.id}
-//             className="task-card"
-//             style={{ backgroundColor: task.color || "#ddd", color: task.textColor || "#000" }}
-//           >
-//             <span className="task-number">{task.id}</span>
-//             <p>{task.title}</p>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dash;
-
-
-
-
-
