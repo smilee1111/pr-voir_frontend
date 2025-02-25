@@ -87,7 +87,7 @@ const Profile = () => {
 
             <div className="profile-card">
                 <div className="tasks-section">
-                    <p className="tasks-title"><em>Goal Tracker chart</em></p>
+                    <p className="tasks-title"><em>Goal Tracker</em></p>
                     <div className="tasks-line"></div>
                     {/* Add TaskProgress component here */}
                     <TaskProgress tasks={tasks} />

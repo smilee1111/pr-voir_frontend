@@ -16,7 +16,7 @@ const Dashboard = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-    navigate("/login");
+    navigate("/landing");
   };
 
   // Toggle dropdown visibility

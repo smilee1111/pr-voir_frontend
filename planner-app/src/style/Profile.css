@@ -1,78 +1,395 @@
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --accent-color: #4cc9f0;
+  --text-color: #333333;
+  --light-text: #ffffff;
+  --background-color: #f8f9fa;
+  --card-background: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+
+
+/* Keep the navbar styling as is - just including essentials for reference */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  padding: 15px 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Profile.css */
+/* Root variables and navbar styles are kept as provided by you */
+
+/* Profile Container */
 .profile-container {
+  min-height: 100vh;
+  background-color: var(--background-color);
+  padding-bottom: 30px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar styling remains as provided by you */
+
+/* Navbar links and other components */
+.navbar ul {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar li {
+  margin-right: 20px;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: var(--light-text);
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.navbar a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.navbar a.active {
+  background-color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.logo-container {
+  position: relative;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid var(--light-text);
+  background-color: var(--light-text);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  background-color: var(--card-background);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  padding: 10px;
+  min-width: 150px;
+  z-index: 10;
+  animation: fadeInDown 0.3s ease-in-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: #f44336;
+  border: none;
+  padding: 10px 15px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.logout-btn::before {
+  content: '⟶';
+  margin-right: 8px;
+  font-size: 16px;
+  transform: rotate(180deg);
+}
+
+/* Profile Card Styling */
+.profile-card {
+  background-color: var(--card-background);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px var(--shadow-color);
+  margin: 40px auto;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Tasks Section */
+.tasks-section {
+  padding: 30px;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.tasks-title {
+  font-size: 22px;
+  color: var(--primary-color);
+  margin: 0 0 15px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.tasks-line {
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  width: 70px;
+  margin-bottom: 25px;
+  border-radius: 2px;
+}
+
+.goal-tracker {
+  margin-top: 30px;
+  background-color: rgba(67, 97, 238, 0.05);
   padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
+  border-radius: 12px;
+  border-left: 5px solid var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.goal-tracker:hover {
+  box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1);
+  transform: translateX(5px);
+}
+
+.goal-tracker p {
+  margin: 5px 0;
+  color: var(--text-color);
+}
+
+.goal-tracker p:first-child {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.goal-tracker p:nth-child(2) {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+}
+
+.goal-tracker ul {
+  margin: 10px 0 0 0;
+  padding-left: 20px;
+}
+
+.goal-tracker li {
+  margin-bottom: 8px;
+  color: var(--text-color);
+  position: relative;
+  padding-left: 5px;
+}
+
+.goal-tracker li::before {
+  content: '✓';
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* User Section */
+.user-section {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.1));
+  position: relative;
+}
+
+.user-section::before {
+  content: '';
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  margin-bottom: 20px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="%23ffffff"><path d="M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1h2z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50px;
+  box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+}
+
+.username {
+  font-size: 22px;
+  color: var(--secondary-color);
+  margin-top: 15px;
+  font-weight: 700;
+  text-align: center;
+  position: relative;
+}
+
+.username::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-color), transparent);
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+/* TaskProgress Component Styling */
+.task-progress-container {
+  margin-top: 25px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.task-progress-container:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar-container {
+  height: 14px;
+  background-color: #e6e8f0;
+  border-radius: 10px;
+  margin: 15px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: 10px;
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-color);
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.progress-percentage {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
   .profile-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #c2aa89;
-    width: 80%;
-    max-width: 900px;
-    padding: 40px;
-    margin-top: 20px;
-    border-radius: 15px;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    max-width: 95%;
+    margin: 20px auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-card {
+    grid-template-columns: 1fr;
   }
   
   .tasks-section {
-    flex: 1;
-  }
-  
-  .tasks-title {
-    font-size: 1.2rem;
-    color: #333;
-  }
-  
-  .tasks-line {
-    width: 100%;
-    height: 2px;
-    background-color: #736b5e;
-    margin: 5px 0;
-  }
-  
-  .goal-tracker {
-    background-color: #ddd;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-  }
-  
-  .chart-placeholder {
-    width: 100%;
-    height: 50px;
-    background-color: #b0b0b0;
-    margin-top: 10px;
-    border-radius: 5px;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
   
   .user-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding-top: 30px;
+    padding-bottom: 40px;
   }
   
+  .navbar ul {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding-bottom: 5px;
+  }
+  
+  .navbar li {
+    display: inline-block;
+  }
+}
 
+@media (max-width: 480px) {
+  .tasks-section,
+  .user-section {
+    padding: 20px 15px;
+  }
+  
+  .tasks-title {
+    font-size: 20px;
+  }
+  
+  .user-section::before {
+    width: 80px;
+    height: 80px;
+    background-size: 40px;
+  }
   
   .username {
-    margin-top: 10px;
-    font-size: 1.2rem;
-    font-style: italic;
-    color: #333;
+    font-size: 18px;
   }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .profile-card {
-      flex-direction: column;
-      text-align: center;
-    }
-  
-    .tasks-section, .user-section {
-      width: 100%;
-    }
-  
- 
-  }
-  
+}

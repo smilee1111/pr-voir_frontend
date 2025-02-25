@@ -15,10 +15,14 @@ const Landing = () => {
             <li>See what’s on your schedule.</li>
             <li>Stay motivated.</li>
           </ul>
-          <button className="get-started-btn" onClick={() => navigate("/register")}>
-            Get Started
-            <img src="/click.png" alt="Click Icon" />
-          </button>
+          <div className="button-group">
+            <button className="primary-btn" onClick={() => navigate("/register")}>
+              Sign Up
+            </button>
+            <button className="secondary-btn" onClick={() => navigate("/login")}>
+              Login
+            </button>
+          </div>
         </div>
         <div className="landing-image">
           <img src="/planner-graphic.png" alt="Planner Icon" />

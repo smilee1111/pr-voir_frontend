@@ -1,200 +1,442 @@
-.schedule-page{
-  padding: 20px;
-  font-family: Arial, sans-serif;
+/* Schedule.css - Professional Calendar Styling */
+
+/* Page Layout */
+.schedule-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding-bottom: 2rem;
 }
 
+/* Keep the navbar styling as is - just including essentials */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Schedule Container */
 .schedule-container {
-  width: 90%;
-  max-width: 1000px;
-  margin: auto;
-  
-  
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Calendar Header */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
 }
 
 .title {
-  font-size: 24px;
-  margin: 20px 0;
-}
-/* Calendar Styling */
-.schedule-container {
-  width: 100%;
-  max-width: 1000px;
-  margin: auto;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  font-weight: 600;
+  margin: 0;
   text-align: center;
-  min-width: 1500px;
 }
 
-.title {
-  font-size: 24px;
-  margin: 20px 0;
+.nav-btn {
+  background-color: #f1f3f5;
+  border: none;
+  color: #495057;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
+.nav-btn:hover {
+  background-color: #e9ecef;
+  color: #228be6;
+}
+
+/* Calendar Grid */
 .calendar-grid {
-  
-  align-items: start;
-  /* min-width: 1000px;  */
-
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Weekday labels */
+/* Weekdays Row */
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  font-weight: bold;
-  padding: 10px 0;
-  color: #2c3e50;
+  background-color: #f1f3f5;
+  font-weight: 600;
+  color: #495057;
+  text-align: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e9ecef;
 }
 
-/* Calendar days */
+.weekdays span {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Days Grid */
 .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  grid-gap: 1px;
+  background-color: #e9ecef;
 }
 
-.day {
-  padding: 15px;
-  background: #ecf0f1;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
+.day, .empty-day {
+  background-color: #fff;
+  min-height: 120px;
+  padding: 0.5rem;
+  position: relative;
+  border-bottom: 1px solid #e9ecef;
+  border-right: 1px solid #e9ecef;
+  transition: background-color 0.2s;
 }
 
 .day:hover {
-  background: #bdc3c7;
+  background-color: #f8f9fa;
+  cursor: pointer;
 }
 
-/* Modal Styles */
+.empty-day {
+  background-color: #f8f9fa;
+}
+
+/* Highlight Today */
+.today {
+  background-color: #e7f5ff;
+  font-weight: bold;
+}
+
+.today::after {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 8px;
+  height: 8px;
+  background-color: #4dabf7;
+  border-radius: 50%;
+}
+
+/* Day Number */
+.day::before {
+  content: attr(data-day);
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+/* Event Styling */
+.event {
+  margin-top: 1.5rem;
+  background-color: #d0ebff;
+  color: #1971c2;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  cursor: default;
+  border-left: 3px solid #1971c2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  margin-bottom: 0.25rem;
+}
+
+/* Rotate through different event colors */
+.event:nth-child(3n+1) {
+  background-color: #d3f9d8;
+  color: #2b8a3e;
+  border-left-color: #2b8a3e;
+}
+
+.event:nth-child(3n+2) {
+  background-color: #fff3bf;
+  color: #e67700;
+  border-left-color: #e67700;
+}
+
+.event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.delete-icon {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.event:hover .delete-icon {
+  opacity: 1;
+}
+
+/* Modal Styling */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 2000;
 }
 
 .modal-content {
-  background: white;
-  padding: 20px;
+  background-color: #fff;
+  padding: 2rem;
   border-radius: 8px;
-  width: 300px;
-  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .close-btn {
   position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 20px;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 1.5rem;
   cursor: pointer;
+  color: #adb5bd;
+  transition: color 0.2s;
 }
 
-input, textarea {
-  width: 100%;
-  margin: 10px 0;
-  padding: 8px;
+.close-btn:hover {
+  color: #212529;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #343a40;
+  font-weight: 600;
+  font-size: 1.3rem;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1rem;
+}
+
+/* Form Styling */
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content input,
+.modal-content textarea {
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-content label {
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #4dabf7;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
+}
+
+.modal-content textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
 .submit-btn {
-  background: #2c3e50;
+  background-color: #4dabf7;
   color: white;
-  padding: 10px;
   border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-weight: 600;
   cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.2s;
 }
 
 .submit-btn:hover {
-  background: #1a252f;
+  background-color: #3c99e8;
 }
 
-/* Responsive Design */
+/* Time Input Styling */
+input[type="time"] {
+  appearance: none;
+  -moz-appearance: textfield;
+  -webkit-appearance: none;
+  width: 100%;
+  background-color: #f8f9fa;
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
+  .weekdays span {
+    font-size: 0.75rem;
   }
-
-  .navbar ul {
-    flex-direction: column;
+  
+  .day, .empty-day {
+    min-height: 80px;
   }
-
-  .days {
-    grid-template-columns: repeat(7, minmax(30px, 1fr));
+  
+  .event {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.7rem;
   }
-
-  .day {
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  .modal-content {
-    width: 90%;
+  
+  .title {
+    font-size: 1.4rem;
   }
 }
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.button:hover{
-  color: #2c3e50;
-}
-.nav-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
+
+/* Extra small devices */
+@media (max-width: 576px) {
+  .weekdays span {
+    font-size: 0.7rem;
+  }
+  
+  .day, .empty-day {
+    min-height: 60px;
+    padding: 0.3rem;
+  }
+  
+  .day::before {
+    font-size: 0.8rem;
+  }
+  
+  .event {
+    margin-top: 1.2rem;
+    padding: 0.2rem 0.3rem;
+    font-size: 0.65rem;
+  }
 }
 
-.nav-btn:hover {
-  color: #2c3e50;
-}
-
-/* Adjusting Calendar Grid */
-.empty-day {
-  visibility: hidden;
-}
-
+/* Fix for the calendar number placement */
 .day {
-  padding: 15px;
-  background: #ecf0f1;
+  padding-top: 2rem;
+}
+
+/* Add visual decoration to make it more appealing */
+.calendar-grid::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 20px;
+  width: 40px;
+  height: 10px;
+  background-color: #fa5252;
   border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
 }
 
-.day:hover {
-  background: #bdc3c7;
+.calendar-grid::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 70px;
+  width: 40px;
+  height: 10px;
+  background-color: #4dabf7;
+  border-radius: 4px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .days {
-    grid-template-columns: repeat(7, minmax(30px, 1fr));
-  }
-
-  .day {
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  .modal-content {
-    width: 90%;
-  }
-}
-.today {
-  background: #3498db !important; /* Highlight color */
+/* Day Hover Effect */
+.day:hover::after {
+  content: '+';
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 20px;
+  height: 20px;
+  background-color: #4dabf7;
   color: white;
-  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+/* Enhance the calendar container */
+.calendar-grid {
+  position: relative;
+  border: 1px solid #e9ecef;
+}
+
+/* Logout Button */
+.logout-btn {
+  background-color: #fa5252;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #e03131;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+.logo-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }

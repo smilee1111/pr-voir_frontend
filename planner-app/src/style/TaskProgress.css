@@ -1,30 +1,44 @@
+/* TaskProgress.css */
 .progress-container {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px var(--shadow-color);
     text-align: center;
+    max-width: 400px;
+    margin: auto;
 }
 
 .progress-header {
-    color: #e73661;
-    margin-bottom: 10px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 .progress-bar {
     width: 100%;
-    height: 20px;
-    background: #e9ecef;
+    background: var(--border-light);
     border-radius: 10px;
     overflow: hidden;
+    height: 20px;
     position: relative;
 }
 
 .progress-fill {
+    background: var(--primary-color);
     height: 100%;
-    background: #b84d68;
-    color: white;
     text-align: center;
+    color: var(--light-text);
+    font-size: 0.9rem;
+    font-weight: bold;
     line-height: 20px;
-    transition: width 0.4s ease-in-out;
+    transition: width 0.5s ease-in-out;
+    border-radius: 10px;
+}
+
+.progress-fill::after {
+    content: attr(style);
+    display: block;
+    width: 100%;
+    text-align: center;
 }
