@@ -107,6 +107,14 @@ export const deleteTask = async (id) => {
         return { error: "Task deletion failed" };
     }
 };
+export const getTasksByUser = async (userId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/task/getTasksByUser/${userId}`);
+        return response.data;
+    } catch (error) {
+        return { error: error.response?.data || "Failed to fetch tasks" };
+    }
+};
 
 // =======================
 //  EVENT MANAGEMENT APIS

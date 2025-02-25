@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../style/Profile.css";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllTasks } from "../apis/auth"; // Assuming the API function for fetching tasks is here
+import { getAllTasks,getTasksByUser } from "../apis/auth"; // Assuming the API function for fetching tasks is here
 import TaskProgress from "../components/TaskProgress"; // Adjust the import based on where TaskProgress is located
 
 const Profile = () => {
@@ -24,31 +24,31 @@ const Profile = () => {
         setDropdownVisible(!dropdownVisible);
     };
 
-    // Fetch tasks for the user
     useEffect(() => {
-        const fetchTasks = async () => {
-            const data = await getAllTasks(); // Replace this with actual API call
+        const fetchUserTasks = async () => {
+            const userId = localStorage.getItem("userId"); // Get userId from localStorage
+            if (!userId) return;
+    
+            const data = await getTasksByUser(userId);
             if (!data.error) {
-                setTasks(data); // Assuming data is an array of tasks
-
-                // Filter out tasks that are "done" today
+                setTasks(data);
+    
+                // Filter tasks completed today
                 const today = new Date();
-                const currentDateString = today.toISOString().split("T")[0]; // Extract the date part (yyyy-mm-dd)
-
-                // Get completed tasks today based on 'status' and 'duetime' within today's date
+                const currentDateString = today.toISOString().split("T")[0];
+    
                 const completedTasksTodayList = data.filter((task) => {
-                    // Assuming task.duetime is a string like 'HH:mm:ss'
-                    const taskDate = new Date(`${currentDateString}T${task.duetime}`); // Combine today's date with task time
-                    return task.status === "done" && taskDate.toDateString() === today.toDateString(); // Check if task was completed today
+                    const taskDate = new Date(`${currentDateString}T${task.duetime}`);
+                    return task.status === "done" && taskDate.toDateString() === today.toDateString();
                 });
-
-                setCompletedTasksToday(completedTasksTodayList); // Store the completed tasks
+    
+                setCompletedTasksToday(completedTasksTodayList);
             } else {
-                console.error(data.error); // Handle error appropriately
+                console.error(data.error);
             }
         };
-
-        fetchTasks();
+    
+        fetchUserTasks();
     }, []);
         // Set username from localStorage on component mount
         useEffect(() => {
