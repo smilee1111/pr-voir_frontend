@@ -19,6 +19,9 @@ const ForgotPasswordForm = ({ onClose }) => {
     }
   };
 
+
+
+  ///this is forgot password form that will appear upon clicking forgot pasword button in login
   return (
     <div className="forgot-password-form">
       <h2>Forgot Password</h2>
