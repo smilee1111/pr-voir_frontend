@@ -12,7 +12,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/landing" element={<Landing />} />  {/* Set Landing as homepage */}
+        <Route path="/" element={<Landing />} />  {/* Set Landing as homepage */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dash />} />

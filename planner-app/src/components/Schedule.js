@@ -110,7 +110,7 @@ const Schedule = () => {
     localStorage.removeItem("userId"); // Remove user from localStorage
     localStorage.removeItem("token"); // Remove user from localStorage
     localStorage.removeItem("username"); // Remove username from localStorage
-    navigate("/landing"); // Redirect to login page
+    navigate("/"); // Redirect to login page
   };
   
 
