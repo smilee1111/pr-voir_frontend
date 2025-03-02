@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../style/Profile.css";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllTasks,getTasksByUser } from "../apis/auth"; // Assuming the API function for fetching tasks is here
+import { getTasksByUser } from "../apis/auth"; // Assuming the API function for fetching tasks is here
 import TaskProgress from "../components/TaskProgress"; // Adjust the import based on where TaskProgress is located
 
 const Profile = () => {
@@ -28,35 +28,53 @@ const Profile = () => {
         const fetchUserTasks = async () => {
             const userId = localStorage.getItem("userId"); // Get userId from localStorage
             if (!userId) return;
-    
+
+            // Fetch tasks for the user
             const data = await getTasksByUser(userId);
             if (!data.error) {
                 setTasks(data);
-    
+
                 // Filter tasks completed today
                 const today = new Date();
-                const currentDateString = today.toISOString().split("T")[0];
-    
+                const currentDateString = today.toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+
                 const completedTasksTodayList = data.filter((task) => {
-                    const taskDate = new Date(`${currentDateString}T${task.duetime}`);
-                    return task.status === "done" && taskDate.toDateString() === today.toDateString();
+                    // If duetime is only a time, prepend today's date
+                    let taskDateString = task.duetime;
+                    if (taskDateString && !taskDateString.includes("T")) {
+                        taskDateString = `${currentDateString}T${taskDateString}`;
+                    }
+
+                    // Ensure duetime is a valid date string
+                    const taskDate = new Date(taskDateString);
+
+                    // Check if taskDate is a valid date object
+                    if (isNaN(taskDate.getTime())) {
+                        console.warn(`Invalid duetime for task: ${task.taskid}`);
+                        return false; // Skip tasks with invalid duetime
+                    }
+
+                    const taskDateOnlyString = taskDate.toISOString().split("T")[0]; // Get task's date part (YYYY-MM-DD)
+
+                    return task.status === "done" && taskDateOnlyString === currentDateString;
                 });
-    
+
                 setCompletedTasksToday(completedTasksTodayList);
             } else {
                 console.error(data.error);
             }
         };
-    
+
         fetchUserTasks();
     }, []);
-        // Set username from localStorage on component mount
-        useEffect(() => {
-          const storedUsername = localStorage.getItem("username"); // Fetch username from localStorage
-          if (storedUsername) {
-              setUsername(storedUsername); // Set username to state
-          }
-      }, []);
+
+    // Set username from localStorage on component mount
+    useEffect(() => {
+        const storedUsername = localStorage.getItem("username"); // Fetch username from localStorage
+        if (storedUsername) {
+            setUsername(storedUsername); // Set username to state
+        }
+    }, []);
 
     return (
         <div className="profile-container">
@@ -104,7 +122,7 @@ const Profile = () => {
                     </div>
                 </div>
                 <div className="user-section">
-                <p className="username"><em>{username}</em></p> {/* Display the username here */}
+                    <p className="username"><em>{username}</em></p> {/* Display the username here */}
                 </div>
             </div>
         </div>
