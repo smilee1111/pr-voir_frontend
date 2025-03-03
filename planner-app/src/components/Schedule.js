@@ -4,17 +4,20 @@ import {
   getAllEvents,
   createEvent,
   deleteEvent,
-} from "../apis/auth"; // Import API functions
+  updateEvent, // Add updateEvent import
+} from "../apis/auth";
 import "../style/Schedule.css";
 
 const Schedule = () => {
   const today = new Date();
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [events, setEvents] = useState({}); // Store events by date
+  const [events, setEvents] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [dropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // New state for edit mode
+  const [selectedEvent, setSelectedEvent] = useState(null); // New state for event being edited
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -36,10 +39,9 @@ const Schedule = () => {
   const firstDayIndex = getFirstDayOfMonth(currentYear, currentMonth);
   const emptySlots = Array(firstDayIndex).fill(null);
 
-  // Fetch events from backend when month changes
   useEffect(() => {
     const fetchEvents = async () => {
-      const userId = localStorage.getItem("userId"); // Get userId from localStorage
+      const userId = localStorage.getItem("userId");
       if (!userId) {
         alert("User not logged in.");
         return;
@@ -50,7 +52,6 @@ const Schedule = () => {
         const filteredEvents = result.filter(event => event.userId === parseInt(userId));
         
         const eventData = {};
-        // Group events by day, ensuring they are mapped correctly to each day of the current month
         for (let day = 1; day <= daysInMonth; day++) {
           eventData[day] = filteredEvents.filter(event => {
             const eventDate = new Date(event.startdatetime);
@@ -86,18 +87,39 @@ const Schedule = () => {
 
   const handleDateClick = (day) => {
     setSelectedDate(day);
+    setIsEditing(false); // Reset to create mode
+    setSelectedEvent(null);
     setFormData({
       title: "",
       description: "",
-      startdatetime: "12:00", // Default time
-      enddatetime: "13:00",   // Default time
+      startdatetime: "12:00",
+      enddatetime: "13:00",
       location: "",
+    });
+    setShowModal(true);
+  };
+
+  const handleEventClick = (event, day) => {
+    setSelectedDate(day);
+    setIsEditing(true);
+    setSelectedEvent(event);
+    // Format times for input fields
+    const startTime = new Date(event.startdatetime).toTimeString().slice(0, 5);
+    const endTime = new Date(event.enddatetime).toTimeString().slice(0, 5);
+    setFormData({
+      title: event.title,
+      description: event.description || "",
+      startdatetime: startTime,
+      enddatetime: endTime,
+      location: event.location || "",
     });
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
+    setIsEditing(false);
+    setSelectedEvent(null);
     setFormData({ title: "", description: "", startdatetime: "", enddatetime: "", location: "" });
   };
 
@@ -105,14 +127,12 @@ const Schedule = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Logout function
   const handleLogout = () => {
-    localStorage.removeItem("userId"); // Remove user from localStorage
-    localStorage.removeItem("token"); // Remove user from localStorage
-    localStorage.removeItem("username"); // Remove username from localStorage
-    navigate("/"); // Redirect to login page
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate("/");
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,8 +147,7 @@ const Schedule = () => {
     const endDateTime = new Date(selectedFullDate);
     endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0);
 
-    // Get userId from localStorage or authentication state
-    const userId = localStorage.getItem("userId"); // Ensure this is stored at login
+    const userId = localStorage.getItem("userId");
 
     if (!userId) {
       alert("User not logged in.");
@@ -141,21 +160,36 @@ const Schedule = () => {
       startdatetime: startDateTime.toISOString(),
       enddatetime: endDateTime.toISOString(),
       location: formData.location,
-      userId: parseInt(userId), // Include userId
+      userId: parseInt(userId),
     };
 
     try {
-      const newEvent = await createEvent(eventData);
-
-      if (!newEvent.error) {
-        setEvents({
-          ...events,
-          [selectedDate]: [...(events[selectedDate] || []), newEvent],
-        });
-        closeModal();
+      if (isEditing && selectedEvent) {
+        // Update existing event
+        const updatedEvent = await updateEvent(selectedEvent.eventid, eventData);
+        if (!updatedEvent.error) {
+          setEvents({
+            ...events,
+            [selectedDate]: events[selectedDate].map(event =>
+              event.eventid === selectedEvent.eventid ? updatedEvent : event
+            ),
+          });
+          closeModal();
+        } else {
+          alert("Error updating event: " + updatedEvent.error);
+        }
       } else {
-        console.error("Error saving event:", newEvent.error);
-        alert("Error saving event: " + newEvent.error);
+        // Create new event
+        const newEvent = await createEvent(eventData);
+        if (!newEvent.error) {
+          setEvents({
+            ...events,
+            [selectedDate]: [...(events[selectedDate] || []), newEvent],
+          });
+          closeModal();
+        } else {
+          alert("Error saving event: " + newEvent.error);
+        }
       }
     } catch (error) {
       console.error("Error submitting event:", error);
@@ -165,17 +199,16 @@ const Schedule = () => {
 
   const handleDeleteEvent = async (eventid, day) => {
     try {
-      await deleteEvent(eventid); // Pass the eventId to the backend
+      await deleteEvent(eventid);
       setEvents({
         ...events,
-        [day]: events[day].filter((event) => event.eventid !== eventid), // Ensure the filter is done on 'eventid' (not 'id')
+        [day]: events[day].filter((event) => event.eventid !== eventid),
       });
     } catch (error) {
       console.error("Error deleting event:", error);
     }
   };
 
-  // Toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
@@ -195,7 +228,7 @@ const Schedule = () => {
               src="/planner-graphic.png"
               alt="Logo"
               className="logo"
-              onClick={toggleDropdown} // Toggle dropdown on logo click
+              onClick={toggleDropdown}
             />
             {dropdownVisible && (
               <div className="dropdown-menu">
@@ -230,16 +263,33 @@ const Schedule = () => {
                               currentYear === today.getFullYear();
 
               return (
-                <div key={day} className={`day ${isToday ? "today" : ""}`} onClick={() => handleDateClick(day)}>
+                <div 
+                  key={day} 
+                  className={`day ${isToday ? "today" : ""}`}
+                  onClick={() => handleDateClick(day)}
+                >
                   {day}
-                  {events[day]?.map((event, eventIndex) => {
-                    return (
-                      <div key={eventIndex} className="event">
-                        {event.title}
-                        <span className="delete-icon" onClick={() => handleDeleteEvent(event.eventid, day)}>🗑</span>
-                      </div>
-                    );
-                  })}
+                  {events[day]?.map((event, eventIndex) => (
+                    <div 
+                      key={eventIndex} 
+                      className="event"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering handleDateClick
+                        handleEventClick(event, day);
+                      }}
+                    >
+                      {event.title}
+                      <span 
+                        className="delete-icon" 
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent triggering handleEventClick
+                          handleDeleteEvent(event.eventid, day);
+                        }}
+                      >
+                        🗑
+                      </span>
+                    </div>
+                  ))}
                 </div>
               );
             })}
@@ -250,21 +300,52 @@ const Schedule = () => {
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <span className="close-btn" onClick={closeModal}>&times;</span>
-            <h3>Add Event for {months[currentMonth]} {selectedDate}, {currentYear}</h3>
+            <span className="close-btn" onClick={closeModal}>×</span>
+            <h3>
+              {isEditing ? "Edit Event" : "Add Event"} for {months[currentMonth]} {selectedDate}, {currentYear}
+            </h3>
             <form onSubmit={handleSubmit}>
-              <input type="text" name="title" placeholder="Event Title" value={formData.title} onChange={handleChange} required />
-              <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange}></textarea>
-
+              <input 
+                type="text" 
+                name="title" 
+                placeholder="Event Title" 
+                value={formData.title} 
+                onChange={handleChange} 
+                required 
+              />
+              <textarea 
+                name="description" 
+                placeholder="Description" 
+                value={formData.description} 
+                onChange={handleChange}
+              />
               <label>Start Time:</label>
-              <input type="time" name="startdatetime" value={formData.startdatetime} onChange={handleChange} required />
-
+              <input 
+                type="time" 
+                name="startdatetime" 
+                value={formData.startdatetime} 
+                onChange={handleChange} 
+                required 
+              />
               <label>End Time:</label>
-              <input type="time" name="enddatetime" value={formData.enddatetime} onChange={handleChange} required />
-
-              <input type="text" name="location" placeholder="Location" value={formData.location} onChange={handleChange} required />
-
-              <button type="submit" className="submit-btn">Save Event</button>
+              <input 
+                type="time" 
+                name="enddatetime" 
+                value={formData.enddatetime} 
+                onChange={handleChange} 
+                required 
+              />
+              <input 
+                type="text" 
+                name="location" 
+                placeholder="Location" 
+                value={formData.location} 
+                onChange={handleChange} 
+                required 
+              />
+              <button type="submit" className="submit-btn">
+                {isEditing ? "Update Event" : "Save Event"}
+              </button>
             </form>
           </div>
         </div>
