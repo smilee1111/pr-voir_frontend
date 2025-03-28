@@ -21,8 +21,8 @@
     "dev": "concurrently \"cd ../self_planner_website_backend && nodemon index.js\" \"npm start\"",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test": "jest --runInBand"
   },
   "eslintConfig": {
     "extends": [

@@ -4,6 +4,7 @@ import { registerUser } from "../apis/auth"; // Import the registerUser function
 import "../style/Register.css";
 
 const Register = () => {
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -24,17 +25,20 @@ const Register = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await registerUser(formData); // Use registerUser from auth.js
-      setMessage(response.message || "Registration successful");
-      setTimeout(() => navigate("/login"), 2000); // Redirect after success
-    } catch (error) {
-      setMessage(error.error || "Registration failed");
+    setError(""); // Reset previous error
+
+    const response = await registerUser(formData);
+    
+    if (response.error) {
+        setError(response.error); // Show error on UI
+        alert(`❌ Registration Failed: ${response.error}`); // ✅ Show alert message
+    } else {
+        alert("✅ Registration successful! Redirecting to login..."); 
+        window.location.href = "/login"; 
     }
-  };
+};
 
   return (
     <div className="register-container">
